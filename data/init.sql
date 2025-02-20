@@ -1,0 +1,189 @@
+-- Adminer 4.8.1 MySQL 11.5.2-MariaDB-ubu2404 dump
+
+SET NAMES utf8;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
+SET NAMES utf8mb4;
+
+CREATE DATABASE `CocktailAppDB` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci */;
+USE `CocktailAppDB`;
+
+DROP TABLE IF EXISTS `Users`;
+CREATE TABLE `Users` (
+  `ID` uuid NOT NULL,
+  `Email` varchar(100) NOT NULL,
+  `First_name` varchar(100) NOT NULL,
+  `Last_name` varchar(100) NOT NULL,
+  `Password` varchar(100) NOT NULL,
+  `Role` enum('User','Admin') NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `Email` (`Email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+INSERT INTO `Users` (`ID`, `Email`, `First_name`, `Last_name`, `Password`, `Role`) VALUES
+('4ddf17a1-5c1a-4fe5-ac50-01c52a05baa2',	'admin@mail.com',	'Admin',	'User',	'admin',	'Admin');
+
+DROP TABLE IF EXISTS `Cocktails`;
+CREATE TABLE `Cocktails` (
+  `ID` uuid NOT NULL,
+  `Name` varchar(100) NOT NULL,
+  `Description` text DEFAULT NULL,
+  `Recipe` text DEFAULT NULL,
+  `Taste` enum('Sweet','Sour','Strong') NOT NULL,
+  `Volume` decimal(5,2) NOT NULL COMMENT 'in cL',
+  `Alcohol` decimal(5,2) DEFAULT 0.00 COMMENT 'in cL',
+  `Image` tinyint(1) DEFAULT 0,
+  `CreatorID` uuid DEFAULT NULL,
+  `Valid` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `Name` (`Name`),
+  KEY `CreatorID` (`CreatorID`),
+  CONSTRAINT `Cocktails_ibfk_1` FOREIGN KEY (`CreatorID`) REFERENCES `Users` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+INSERT INTO `Cocktails` (`ID`, `Name`, `Description`, `Recipe`, `Taste`, `Volume`, `Alcohol`, `Image`, `CreatorID`, `Valid`) VALUES
+('2de91c37-668e-4bdd-bf3f-074ca6f12c73',	'White Russian',	'Une boisson riche et crémeuse à base de vodka, de liqueur de café et de crème.',	'- Munissez-vous d’un verre old fashioned et déposez-y quelques glaçons.\r\n- Rajoutez-y la vodka et la liqueur de café.\r\n- Prenez la cuillère à mélange et placez-la au milieu du verre, en la tenant droite. Faites couler lentement la crème fraîche liquide sur la cuillère, dans le verre, afin de créer une couche de crème distincte.\r\n- Mélangez le tout lentement, afin que la crème reste surtout en surface.\r\n- Votre cocktail est prêt.',	'Sweet',	10.00,	5.00,	0,	NULL,	1),
+('e8cff121-08bc-4e45-81d1-0884000e1983',	'Sex on the Beach',	'Un cocktail fruité et populaire dans les bars estivaux.',	'- Remplissez votre shaker de glaçons.\r\n- Versez la vodka, le Schnapps pêche ou la crème de pêche et le jus de cranberry.\r\n- Shakez votre mélange pendant une dizaine de secondes.\r\n- Remplissez votre verre long drink de glaçons.\r\n- Versez le jus d’orange.\r\n- Ajoutez-y votre mixture préalablement mélangée en la filtrant avec une passoire à cocktail.',	'Sweet',	15.00,	4.00,	0,	NULL,	1),
+('3ac3f88d-d2db-4612-acc7-1060aefcc8bc',	'Margarita',	'Un cocktail acidulé et salé, parfait pour les amateurs de tequila.',	'- Mettez votre verre à cocktail dans votre réfrigérateur ou congélateur le temps de la préparation.\r\n- Dans un shaker, ajoutez des glaçons.\r\n- Versez la tequila, le triple sec et le jus de citron vert.\r\n- Secouez énergiquement pendant quelques secondes.\r\n- Récupérez votre verre et versez le mélange à l’aide d’une passoire à cocktail afin de filtrer les glaçons.',	'Sour',	12.00,	6.00,	0,	NULL,	1),
+('07fa1eec-4efc-4281-bf13-185c095f31c0',	'Piña Colada',	"Une boisson douce et exotique à base d'ananas et de noix de coco.",	'- Dans un shaker, versez le rhum blanc, le jus d’ananas, la crème de coco et le sirop de canne.\r\n- Secouez énergiquement pendant 1 minute afin de bien les mélanger.\r\n- Munissez-vous de votre verre long drink.\r\n- Rafraîchissez le verre en y ajoutant une bonne quantité de glaçons.\r\n- Versez-y le mélange du shaker.\r\n- Dégustez votre Piña Colada très fraîche.',	'Sweet',	20.00,	4.00,	0,	NULL,	1),
+('037b22c9-ad89-4e80-9c27-1d15a94f6b70',	'Cosmopolitan',	'Un cocktail élégant à base de vodka et de jus de cranberry.',	'- Remplissez votre shaker à moitié de glaçons.\r\n- Versez la vodka.\r\n- Ajoutez le triple sec et le jus de cranberry et le jus de citron vert.\r\n- Shakez le cocktail.\r\n- Prenez un verre et munissez-vous de la passoire à cocktail.\r\n- Filtrez le contenu dans votre verre à cocktail.\r\n- Posez une rondelle de citron sur le bord du verre.\r\n- Votre cocktail est prêt.',	'Sour',	10.00,	6.00,	0,	NULL,	1),
+('fe5f0820-5787-4d8e-a357-2a54187bce3b',	'Old Fashioned',	'Une boisson classique au goût riche et complexe.',	'- Au fond d’un verre Old Fashioned, posez le morceau de sucre préalablement imbibé d’un trait de bitter Angostura.\r\n- Ajoutez un trait d’eau gazeuse et écrasez le sucre jusqu’à sa dissolution complète.\r\n- Ajoutez des glaçons et versez le whisky .\r\n- Remuez avec une cuillère à mélange pendant une quinzaine de secondes.\r\n- Coupez un zeste d’orange puis nettoyez les bords.\r\n- Exprimez le zeste au-dessus du verre.\r\n- Ajoutez le zeste d’orange dans votre cocktail.',	'Strong',	8.00,	6.00,	0,	NULL,	1),
+('a13f7789-acfb-40ed-8c51-2df323c43bfb',	'Caipirinha',	'Le cocktail national du Brésil, à base de cachaça et de citron vert.',	'- Découpez le citron en petits dés et placez-les dans un verre old fashioned.\r\n- Ecrasez à l’aide d’un pilon pour extraire le jus du citron vert.\r\n- Mettez des glaçons dans un torchon. puis Fermez-le et tapez énergiquement avec le bout d’un rouleau à pâtisserie afin d’obtenir des petits morceaux de glace.\r\n- Ajoutez la glace pilée dans le verre.\r\n- Versez le sirop de sucre et la cachaça.\r\n- Mélangez avec une cuillère à mélange et servez.',	'Sour',	10.00,	5.00,	0,	NULL,	1),
+('cecf2ca7-a1c8-4de7-9df6-51cef11f9055',	'Gin Tonic',	'Un mélange simple et rafraîchissant.',	'- Ajoutez des glaçons dans votre verre piscine.\r\n- Versez le gin.\r\n- Pour un mélange idéal du tonic et du gin, penchez délicatement votre verre piscine avant d’allonger votre cocktail avec le tonic.\r\n- Parfumez votre Gin Tonic avec le zeste d’un citron jaune bien frais.\r\n- Mélangez-le délicatement à l’aide d’une cuillère à cocktail pour libérer tous les arômes de votre Gin Tonic.\r\n- Votre cocktail est prêt',	'Strong',	20.00,	5.00,	0,	NULL,	1),
+('0a061592-6037-43ff-83e3-5c94d256940d',	'Tequila Sunrise',	'Un cocktail visuellement impressionnant avec des couches de couleurs rappelant un lever de soleil.',	'- Mettez des glaçons dans un verre long drink.\r\n- Versez dans l’ordre la Tequila puis le jus d’orange.\r\n- Remuez doucement à l’aide d’une cuillère à mélange.\r\n- Versez lentement le sirop de grenadine en vérifiant que le sirop tombe bien au fond du verre.\r\n- Donnez un petit coup de cuillère à cocktail pour créer un joli dégradé typique du Tequila Sunrise.',	'Sweet',	20.00,	55.00,	0,	NULL,	1),
+('f94ae8d5-eed2-40c0-ac4e-5eb419c77bbf',	'Bloody Mary',	'Une boisson épicée à base de vodka et de jus de tomate.',	'- Dans un shaker, mélanger 4cl de vodka, 12 cl de jus de tomate, ½ cl de jus de citron , ½ cl de worcestershire, 2 gouttes de Tabasco.\r\n\r\n- Ajouter des glaçons puis filtrer et ajouter à convenance sel de céleri et poivre.\r\n\r\n- Servir dans un verre tumbler et décorer d’une branche de céleri.',	'Strong',	15.00,	5.00,	0,	NULL,	1),
+('3be84c65-115f-49d1-b62c-730d785cfaf4',	'Mojito',	'Un cocktail rafraîchissant à base de menthe et de citron vert.',	'- Dans un verre à Mojito, disposez 6 à 8 feuilles de menthe entières préalablement lavées et essuyées.\r\n- Prenez votre demi citron vert. Coupez-le en dés. Déposez-le dans le verre.\r\n- À l’aide d’un verre doseur, versez 2 cl de sirop de canne dans votre verre à mojito.\r\n- Écrasez délicatement avec un pilon les dés de citron vert, les feuilles de menthe et le sirop de canne afin d’en extraire le jus du citron et le parfum des feuilles de menthe.\r\n- À l’aide d’un verre doseur, versez 4 cl de rhum blanc dans le verre.\r\n- Préparez la glace pilée en déposant les glaçons dans un torchon, refermez-le. À l’aide d’un pilon spécial cocktail, frappez fortement pour casser la glace.\r\n- Ajoutez votre glace pilée dans le verre.\r\n- Allongez votre cocktail avec de l’eau gazeuse.\r\n- Mélangez le tout à l’aide d’une cuillère ou un touilleur à mojito avant dégustation.',	'Sweet',	25.00,	5.00,	0,	NULL,	1),
+('0b2b5896-2316-4e95-bfea-93ca5b1a5693',	'Daiquiri',	'Un cocktail rafraîchissant à base de rhum.',	'- Munissez-vous d’un verre à cocktail et versez le rhum blanc, le jus de citron vert et le sirop de sucre en mélangeant légèrement à l’aide d’une cuillère à mélange.\r\n- Ajoutez 3 à 4 glaçons.\r\n- Décorez le rebord du verre avec une rondelle de citron vert.\r\n- Dégustez',	'Sour',	10.00,	5.00,	0,	NULL,	1),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'Mai Tai',	'Un cocktail tropical complexe et équilibré.',	'- Ajoutez des glaçons dans le shaker.\r\n- Versez le Rhum Blanc, le Rhum, le triple sec, le jus de citron vert pressé et le sirop d’orgeat.\r\n- Pour finir, secouez le tout énergiquement pour bien mélanger l’ensemble.\r\n- Versez votre Mai Tai dans un verre long drink.',	'Sweet',	15.00,	6.00,	0,	NULL,	1),
+('27c2f5d8-4ba8-4017-89ef-a63ccbbd869c',	'Blue Lagoon',	'Un cocktail exotique et coloré grâce au curaçao bleu.',	'- Remplissez le shaker à moitié de glaçons.\r\n- Versez la vodka, le curaçao bleu et le jus de citron.\r\n- Remuez énergiquement pendant une quinzaine de secondes.\r\n- Versez votre Blue Lagoon dans un verre long drink en retenant les glaçons avec une passoire à cocktails.',	'Sweet',	15.00,	4.00,	0,	NULL,	1),
+('ac4eba8a-24ef-4b28-839e-f92e03625202',	'Whisky Sour',	'Une boisson classique au goût acidulé.',	'- Dans un shaker rempli de glaçons, pressez le jus de citron vert.\r\n- Ajoutez ensuite le whisky et le sirop de canne * et un blanc d’œuf.\r\n- Remuez énergiquement le shaker pendant une dizaine de secondes.\r\n- Versez dans un verre à cocktail type cobbler en retenant les glaçons à l’aide d’une passoire à cocktail.\r\n- Dégustez votre cocktail Whisky Sour !',	'Sour',	10.00,	5.00,	0,	NULL,	1);
+
+DROP TABLE IF EXISTS `Ingredients`;
+CREATE TABLE `Ingredients` (
+  `ID` uuid NOT NULL,
+  `Name` varchar(100) NOT NULL,
+  `Categ` enum('Alcohol','Juice','Sirop','Soft','Trim','Other') NOT NULL,
+  `AlcoholContent` decimal(5,2) DEFAULT 0.00 COMMENT 'in percentage',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+INSERT INTO `Ingredients` (`ID`, `Name`, `Categ`, `AlcoholContent`) VALUES
+('9d95b897-320d-4c3f-af99-007ad8d9015f',	'Cachaça',	'Alcohol',	48.00),
+('cdcf644f-4e34-4fdb-8a69-042b90e4a807',	"Jus d'orange",	'Juice',	0.00),
+('82460e9a-7920-4dd1-9607-06fb7d3be387',	'Jus de tomate',	'Juice',	0.00),
+('9f84a929-99a7-46a5-b59e-09c7806987d5',	'Vodka',	'Alcohol',	40.00),
+('b589cd54-e01f-4f98-847f-1dda2f08c72a',	'Sirop de grenadine',	'Sirop',	0.00),
+('22724fbd-f377-4e1b-a715-24307632fff8',	'Jus de cranberry',	'Juice',	0.00),
+('d7ff904d-5b16-4bdf-8f6a-28f32b214218',	"Blanc d'œuf",	'Other',	0.00),
+('7a25aec0-f5e8-440a-95e5-2f4b08ffa152',	'Rhum',	'Alcohol',	37.50),
+('4dd2750f-c411-4f62-8503-4d2f418dbf26',	'Jus de citron vert',	'Juice',	0.00),
+('c665fe97-d72d-4846-9dd0-5cb021ad5c3b',	'Citron vert',	'Trim',	0.00),
+('de276fe0-844c-4e80-a620-607f25abb87a',	'Tequila',	'Alcohol',	45.00),
+('d13271c1-4a37-4214-8a8e-74bb42680235',	'Sauce Worcestershire',	'Other',	0.00),
+('d03a4e2f-30f5-4322-949e-7778fcc5dde5',	'Orange',	'Trim',	0.00),
+('7c5cbd1b-ad32-44ee-8c75-7aee1e56733c',	'Curaçao bleu',	'Alcohol',	35.00),
+('3d2341c0-c0f5-4076-a71d-839240ec1d41',	'Citron',	'Trim',	0.00),
+('10b05d8d-ec00-48ac-a01a-88cfd2940610',	"Jus d'ananas",	'Juice',	0.00),
+('8b533e85-d4b0-4cff-893b-94a67f71dfb0',	"Sirop d'orgeat",	'Sirop',	0.00),
+('6b1f3013-ee9e-4732-9a1f-99c944cc5fbf',	'Crème de coco',	'Sirop',	0.00),
+('191d0390-b1f6-4222-ba54-a0837be20fdf',	'Rhum blanc',	'Alcohol',	60.00),
+('eeb3543f-d21a-4491-91df-a2d9687a8e59',	'Eau gazeuse',	'Soft',	0.00),
+('6ee62024-7426-4da5-905b-a3b49bedab0e',	'Tabasco',	'Other',	0.00),
+('1ba7d83b-17b2-4e3c-b8f5-ab9203fb13a1',	'Sucre',	'Other',	0.00),
+('d5d4cb73-f741-4b2e-bcf4-b760b2edd3e1',	'Angostura',	'Alcohol',	44.70),
+('67a25ae7-445f-42c5-8dc5-bcfa20a5df22',	'Triple sec',	'Alcohol',	40.00),
+('5894edac-ca6e-4af4-bb5f-bdd86279a59e',	'Limonade',	'Soft',	0.00),
+('631f8f74-ccb6-488b-b757-cbf7e082d43d',	'Jus de citron',	'Juice',	0.00),
+('7afea75b-194a-46ce-bcf0-cdb40a3be376',	'Crème',	'Other',	0.00),
+('cd644805-6573-4dbf-8149-d83348ecb03a',	'Sirop de canne à sucre',	'Sirop',	0.00),
+('8ed0aae8-f754-4f1b-b7f4-ddcee6b7837d',	'Creme de pêche',	'Alcohol',	25.00),
+('97787c28-b51f-428c-bf8f-e38de6844ba1',	'Whisky',	'Alcohol',	40.00),
+('89510ebd-b154-4ace-91ee-e5a897535af6',	'Menthe',	'Trim',	0.00),
+('34803337-8f7d-4323-85fc-ed3e874ad989',	'Liqueur de café',	'Alcohol',	25.00),
+('d8eb37ca-4119-416e-9067-ee90c6f354a9',	'Épices',	'Other',	0.00),
+('7af345a2-b694-4c62-8c11-f1a1af04bf90',	'Gin',	'Alcohol',	37.50),
+('b67d3278-dad0-4054-8f6b-ff9c216968aa',	'Tonic',	'Soft',	0.00);
+
+DROP TABLE IF EXISTS `CocktailIngredients`;
+CREATE TABLE `CocktailIngredients` (
+  `CocktailID` uuid NOT NULL,
+  `IngredientID` uuid NOT NULL,
+  PRIMARY KEY (`CocktailID`,`IngredientID`),
+  KEY `IngredientID` (`IngredientID`),
+  CONSTRAINT `CocktailIngredients_ibfk_1` FOREIGN KEY (`CocktailID`) REFERENCES `Cocktails` (`ID`),
+  CONSTRAINT `CocktailIngredients_ibfk_2` FOREIGN KEY (`IngredientID`) REFERENCES `Ingredients` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+INSERT INTO `CocktailIngredients` (`CocktailID`, `IngredientID`) VALUES
+('a13f7789-acfb-40ed-8c51-2df323c43bfb',	'9d95b897-320d-4c3f-af99-007ad8d9015f'),
+('e8cff121-08bc-4e45-81d1-0884000e1983',	'cdcf644f-4e34-4fdb-8a69-042b90e4a807'),
+('0a061592-6037-43ff-83e3-5c94d256940d',	'cdcf644f-4e34-4fdb-8a69-042b90e4a807'),
+('f94ae8d5-eed2-40c0-ac4e-5eb419c77bbf',	'82460e9a-7920-4dd1-9607-06fb7d3be387'),
+('2de91c37-668e-4bdd-bf3f-074ca6f12c73',	'9f84a929-99a7-46a5-b59e-09c7806987d5'),
+('e8cff121-08bc-4e45-81d1-0884000e1983',	'9f84a929-99a7-46a5-b59e-09c7806987d5'),
+('037b22c9-ad89-4e80-9c27-1d15a94f6b70',	'9f84a929-99a7-46a5-b59e-09c7806987d5'),
+('f94ae8d5-eed2-40c0-ac4e-5eb419c77bbf',	'9f84a929-99a7-46a5-b59e-09c7806987d5'),
+('27c2f5d8-4ba8-4017-89ef-a63ccbbd869c',	'9f84a929-99a7-46a5-b59e-09c7806987d5'),
+('0a061592-6037-43ff-83e3-5c94d256940d',	'b589cd54-e01f-4f98-847f-1dda2f08c72a'),
+('e8cff121-08bc-4e45-81d1-0884000e1983',	'22724fbd-f377-4e1b-a715-24307632fff8'),
+('037b22c9-ad89-4e80-9c27-1d15a94f6b70',	'22724fbd-f377-4e1b-a715-24307632fff8'),
+('ac4eba8a-24ef-4b28-839e-f92e03625202',	'd7ff904d-5b16-4bdf-8f6a-28f32b214218'),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'7a25aec0-f5e8-440a-95e5-2f4b08ffa152'),
+('3ac3f88d-d2db-4612-acc7-1060aefcc8bc',	'4dd2750f-c411-4f62-8503-4d2f418dbf26'),
+('037b22c9-ad89-4e80-9c27-1d15a94f6b70',	'4dd2750f-c411-4f62-8503-4d2f418dbf26'),
+('0b2b5896-2316-4e95-bfea-93ca5b1a5693',	'4dd2750f-c411-4f62-8503-4d2f418dbf26'),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'4dd2750f-c411-4f62-8503-4d2f418dbf26'),
+('a13f7789-acfb-40ed-8c51-2df323c43bfb',	'c665fe97-d72d-4846-9dd0-5cb021ad5c3b'),
+('3be84c65-115f-49d1-b62c-730d785cfaf4',	'c665fe97-d72d-4846-9dd0-5cb021ad5c3b'),
+('ac4eba8a-24ef-4b28-839e-f92e03625202',	'c665fe97-d72d-4846-9dd0-5cb021ad5c3b'),
+('3ac3f88d-d2db-4612-acc7-1060aefcc8bc',	'de276fe0-844c-4e80-a620-607f25abb87a'),
+('0a061592-6037-43ff-83e3-5c94d256940d',	'de276fe0-844c-4e80-a620-607f25abb87a'),
+('f94ae8d5-eed2-40c0-ac4e-5eb419c77bbf',	'd13271c1-4a37-4214-8a8e-74bb42680235'),
+('fe5f0820-5787-4d8e-a357-2a54187bce3b',	'd03a4e2f-30f5-4322-949e-7778fcc5dde5'),
+('27c2f5d8-4ba8-4017-89ef-a63ccbbd869c',	'7c5cbd1b-ad32-44ee-8c75-7aee1e56733c'),
+('cecf2ca7-a1c8-4de7-9df6-51cef11f9055',	'3d2341c0-c0f5-4076-a71d-839240ec1d41'),
+('07fa1eec-4efc-4281-bf13-185c095f31c0',	'10b05d8d-ec00-48ac-a01a-88cfd2940610'),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'8b533e85-d4b0-4cff-893b-94a67f71dfb0'),
+('07fa1eec-4efc-4281-bf13-185c095f31c0',	'6b1f3013-ee9e-4732-9a1f-99c944cc5fbf'),
+('07fa1eec-4efc-4281-bf13-185c095f31c0',	'191d0390-b1f6-4222-ba54-a0837be20fdf'),
+('3be84c65-115f-49d1-b62c-730d785cfaf4',	'191d0390-b1f6-4222-ba54-a0837be20fdf'),
+('0b2b5896-2316-4e95-bfea-93ca5b1a5693',	'191d0390-b1f6-4222-ba54-a0837be20fdf'),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'191d0390-b1f6-4222-ba54-a0837be20fdf'),
+('fe5f0820-5787-4d8e-a357-2a54187bce3b',	'eeb3543f-d21a-4491-91df-a2d9687a8e59'),
+('3be84c65-115f-49d1-b62c-730d785cfaf4',	'eeb3543f-d21a-4491-91df-a2d9687a8e59'),
+('f94ae8d5-eed2-40c0-ac4e-5eb419c77bbf',	'6ee62024-7426-4da5-905b-a3b49bedab0e'),
+('fe5f0820-5787-4d8e-a357-2a54187bce3b',	'1ba7d83b-17b2-4e3c-b8f5-ab9203fb13a1'),
+('fe5f0820-5787-4d8e-a357-2a54187bce3b',	'd5d4cb73-f741-4b2e-bcf4-b760b2edd3e1'),
+('3ac3f88d-d2db-4612-acc7-1060aefcc8bc',	'67a25ae7-445f-42c5-8dc5-bcfa20a5df22'),
+('037b22c9-ad89-4e80-9c27-1d15a94f6b70',	'67a25ae7-445f-42c5-8dc5-bcfa20a5df22'),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'67a25ae7-445f-42c5-8dc5-bcfa20a5df22'),
+('f94ae8d5-eed2-40c0-ac4e-5eb419c77bbf',	'631f8f74-ccb6-488b-b757-cbf7e082d43d'),
+('27c2f5d8-4ba8-4017-89ef-a63ccbbd869c',	'631f8f74-ccb6-488b-b757-cbf7e082d43d'),
+('2de91c37-668e-4bdd-bf3f-074ca6f12c73',	'7afea75b-194a-46ce-bcf0-cdb40a3be376'),
+('07fa1eec-4efc-4281-bf13-185c095f31c0',	'cd644805-6573-4dbf-8149-d83348ecb03a'),
+('a13f7789-acfb-40ed-8c51-2df323c43bfb',	'cd644805-6573-4dbf-8149-d83348ecb03a'),
+('3be84c65-115f-49d1-b62c-730d785cfaf4',	'cd644805-6573-4dbf-8149-d83348ecb03a'),
+('0b2b5896-2316-4e95-bfea-93ca5b1a5693',	'cd644805-6573-4dbf-8149-d83348ecb03a'),
+('201d087e-4b81-4155-9270-9a5352fe39a7',	'cd644805-6573-4dbf-8149-d83348ecb03a'),
+('ac4eba8a-24ef-4b28-839e-f92e03625202',	'cd644805-6573-4dbf-8149-d83348ecb03a'),
+('e8cff121-08bc-4e45-81d1-0884000e1983',	'8ed0aae8-f754-4f1b-b7f4-ddcee6b7837d'),
+('fe5f0820-5787-4d8e-a357-2a54187bce3b',	'97787c28-b51f-428c-bf8f-e38de6844ba1'),
+('ac4eba8a-24ef-4b28-839e-f92e03625202',	'97787c28-b51f-428c-bf8f-e38de6844ba1'),
+('3be84c65-115f-49d1-b62c-730d785cfaf4',	'89510ebd-b154-4ace-91ee-e5a897535af6'),
+('2de91c37-668e-4bdd-bf3f-074ca6f12c73',	'34803337-8f7d-4323-85fc-ed3e874ad989'),
+('cecf2ca7-a1c8-4de7-9df6-51cef11f9055',	'7af345a2-b694-4c62-8c11-f1a1af04bf90'),
+('cecf2ca7-a1c8-4de7-9df6-51cef11f9055',	'b67d3278-dad0-4054-8f6b-ff9c216968aa');
+
+DROP TABLE IF EXISTS `Ratings`;
+CREATE TABLE `Ratings` (
+  `CocktailID` uuid NOT NULL,
+  `UserID` uuid NOT NULL,
+  `Rating` int(11) NOT NULL COMMENT '0 to 5',
+  PRIMARY KEY (`CocktailID`,`UserID`),
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `Ratings_ibfk_1` FOREIGN KEY (`CocktailID`) REFERENCES `Cocktails` (`ID`),
+  CONSTRAINT `Ratings_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `Users` (`ID`),
+  CONSTRAINT `CONSTRAINT_1` CHECK (`Rating` >= 0 and `Rating` <= 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
