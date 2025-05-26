@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const cocktail_controller_1 = require("../controllers/cocktail.controller");
+const router = (0, express_1.Router)();
+router.get("/fetchCocktails", cocktail_controller_1.getAllCocktails);
+router.post("/fetchCocktail", cocktail_controller_1.getCocktailDetails);
+router.post("/filterCocktails", cocktail_controller_1.getCocktailsFiltered);
+router.post("/profil", cocktail_controller_1.getUserProfile);
+exports.default = router;
