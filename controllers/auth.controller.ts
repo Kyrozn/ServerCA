@@ -90,3 +90,20 @@ export const CocktailRegister = (req: Request, res: Response): void =>  {
     }
   );
 };
+
+export const getUserProfile = (req: Request, res: Response): void => {
+  const { ID } = req.body;
+
+  if (!ID) {
+    res.status(400).json({ success: false, message: "User ID is required" });
+    return;
+  }
+
+  const query = "SELECT * FROM Users WHERE ID = ?";
+  connection.query(query, [ID], (error, results) => {
+    if (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+    res.json({ success: true, profil: results });
+  });
+};

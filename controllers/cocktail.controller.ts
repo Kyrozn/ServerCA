@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import { connection } from "../config/db";
+import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+const fs = require("fs");
+const path = require("path");
+const mutler = require("multer");
 
 export const getAllCocktails = (req: Request, res: Response): void => {
   const query = `
@@ -121,21 +127,4 @@ export const getCocktailDetails = async (
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
-};
-
-export const getUserProfile = (req: Request, res: Response): void => {
-  const { ID } = req.body;
-
-  if (!ID) {
-    res.status(400).json({ success: false, message: "User ID is required" });
-    return;
-  }
-
-  const query = "SELECT * FROM Users WHERE ID = ?";
-  connection.query(query, [ID], (error, results) => {
-    if (error) {
-      return res.status(500).json({ success: false, message: error.message });
-    }
-    res.json({ success: true, profil: results });
-  });
 };
