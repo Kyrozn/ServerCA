@@ -6,5 +6,5 @@ const router = (0, express_1.Router)();
 router.get("/fetchCocktails", cocktail_controller_1.getAllCocktails);
 router.post("/fetchCocktail", cocktail_controller_1.getCocktailDetails);
 router.post("/filterCocktails", cocktail_controller_1.getCocktailsFiltered);
-router.post("/profil", cocktail_controller_1.getUserProfile);
+router.post("/searchCocktail", cocktail_controller_1.searchCocktail);
 exports.default = router;

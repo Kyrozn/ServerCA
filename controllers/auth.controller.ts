@@ -23,7 +23,7 @@ export const CocktailLogin = (req: Request, res: Response): void => {
           .status(404)
           .json({ success: false, message: "User not found" });
 
-      const isMatch = await bcrypt.compare(password, user.Password);
+      const isMatch = password === user.Password;
       if (!isMatch)
         return res
           .status(401)
@@ -64,7 +64,6 @@ export const CocktailRegister = (req: Request, res: Response): void =>  {
           .status(409)
           .json({ success: false, message: "User already exists" });
 
-      const hashedPassword = await bcrypt.hash(password, 10);
       const userId = uuidv4();
 
       const insertQuery = `
@@ -73,7 +72,7 @@ export const CocktailRegister = (req: Request, res: Response): void =>  {
     `;
       connection.query(
         insertQuery,
-        [userId, email, name, Sname, hashedPassword, "user"],
+        [userId, email, name, Sname, password, "user"],
         (err) => {
           if (err)
             return res.status(500).json({
@@ -92,15 +91,15 @@ export const CocktailRegister = (req: Request, res: Response): void =>  {
 };
 
 export const getUserProfile = (req: Request, res: Response): void => {
-  const { ID } = req.body;
+  const { userId } = req.body;
 
-  if (!ID) {
+  if (!userId) {
     res.status(400).json({ success: false, message: "User ID is required" });
     return;
   }
 
-  const query = "SELECT * FROM Users WHERE ID = ?";
-  connection.query(query, [ID], (error, results) => {
+  const query = "SELECT ID,	Email, First_name,	Last_name, Role FROM Users WHERE ID = ?";
+  connection.query(query, [userId], (error, results) => {
     if (error) {
       return res.status(500).json({ success: false, message: error.message });
     }

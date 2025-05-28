@@ -9,18 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserProfile = exports.getCocktailDetails = exports.getCocktailsFiltered = exports.getAllCocktails = void 0;
+exports.searchCocktail = exports.getCocktailDetails = exports.getCocktailsFiltered = exports.getAllCocktails = void 0;
 const db_1 = require("../config/db");
+const fs = require("fs");
+const path = require("path");
+const mutler = require("multer");
 const getAllCocktails = (req, res) => {
-    const query = `
-            SELECT DISTINCT c.ID, c.Name, c.Description, r.Rating, c.Taste
-        FROM 
-            Cocktails c
-        LEFT JOIN 
-            Ratings r ON c.ID = r.CocktailID
-        WHERE 
-            c.Valid = 1
-  `;
+    const query = `SELECT c.ID, c.Name, c.Description, AVG(r.Rating) AS Rating, c.Taste
+                FROM Cocktails c
+                LEFT JOIN Ratings r ON c.ID = r.CocktailID
+                WHERE c.Valid = 1
+                GROUP BY c.ID, c.Name, c.Description, c.Taste;`;
     db_1.connection.query(query, (error, results) => {
         if (error) {
             return res.status(500).json({ success: false, message: error.message });
@@ -30,50 +29,35 @@ const getAllCocktails = (req, res) => {
 };
 exports.getAllCocktails = getAllCocktails;
 const getCocktailsFiltered = (req, res) => {
-    var query;
+    var query = `
+  SELECT DISTINCT 
+    c.ID, 
+    c.Name, 
+    c.Description, 
+    AVG(r.Rating) AS Rating, 
+    c.Taste, 
+    c.Alcohol
+  FROM Cocktails c
+  LEFT JOIN Ratings r ON c.ID = r.CocktailID
+  WHERE c.Valid = 1
+  GROUP BY c.ID, c.Name, c.Description, c.Taste, c.Alcohol
+`;
     switch (req.body.filter) {
         case "Taste":
-            query = `
-        SELECT DISTINCT c.ID, c.Name, c.Description, r.Rating, c.Taste
-        FROM 
-            Cocktails c
-        LEFT JOIN 
-            Ratings r ON c.ID = r.CocktailID
-        WHERE 
-            c.Valid = 1
-        ORDER BY c.Taste DESC
-      `;
+            query += ` ORDER BY c.Taste DESC`;
             break;
         case "Alcohol Degrees":
-            query = `
-        SELECT DISTINCT c.ID, c.Name, c.Description, r.Rating, c.Taste
-        FROM 
-            Cocktails c
-        LEFT JOIN 
-            Ratings r ON c.ID = r.CocktailID
-        WHERE 
-            c.Valid = 1
-        ORDER BY c.Alcohol
-      `;
+            query += ` ORDER BY c.Alcohol`;
             break;
         case "Rating":
-            query = `
-        SELECT DISTINCT c.ID, c.Name, c.Description, r.Rating, c.Taste
-        FROM 
-            Cocktails c
-        LEFT JOIN 
-            Ratings r ON c.ID = r.CocktailID
-        WHERE 
-            c.Valid = 1
-        GROUP BY 
-            c.ID
-        ORDER BY 
-            r.Rating DESC;
-      `;
+            query += ` ORDER BY Rating DESC`;
             break;
         default:
             exports.getAllCocktails;
             return;
+    }
+    if (!isNaN(req.body.limit) && req.body.limit != 0) {
+        query += `\nLimit ` + req.body.limit.toString();
     }
     db_1.connection.query(query, (error, results) => {
         if (error) {
@@ -92,9 +76,10 @@ const getCocktailDetails = (req, res) => __awaiter(void 0, void 0, void 0, funct
         return;
     }
     const cocktailQuery = `
-    SELECT DISTINCT Cocktails.*
+    SELECT DISTINCT Cocktails.*, AVG(Ratings.Rating) as Rating
     FROM Cocktails
     JOIN CocktailIngredients ON Cocktails.ID = CocktailIngredients.CocktailID
+    LEFT JOIN Ratings ON Cocktails.ID = Ratings.CocktailID
     WHERE Cocktails.Valid = 1 AND Cocktails.ID = ?;
   `;
     const ingredientsQuery = `
@@ -119,18 +104,25 @@ const getCocktailDetails = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.getCocktailDetails = getCocktailDetails;
-const getUserProfile = (req, res) => {
-    const { ID } = req.body;
-    if (!ID) {
-        res.status(400).json({ success: false, message: "User ID is required" });
+const searchCocktail = (req, res) => {
+    const query = `
+  SELECT c.ID, c.Name, c.Description, AVG(r.Rating) AS Rating, c.Taste
+  FROM Cocktails c
+  LEFT JOIN Ratings r ON c.ID = r.CocktailID
+  WHERE c.Name COLLATE utf8mb4_general_ci LIKE ?
+  GROUP BY c.ID, c.Name, c.Description, c.Taste
+`;
+    const startWord = req.body.sentence;
+    if (!startWord) {
+        res.json({ success: false, message: "Need a search value" });
         return;
     }
-    const query = "SELECT * FROM Users WHERE ID = ?";
-    db_1.connection.query(query, [ID], (error, results) => {
+    const searchParam = [`${startWord}%`];
+    db_1.connection.query(query, searchParam, (error, results) => {
         if (error) {
             return res.status(500).json({ success: false, message: error.message });
         }
-        res.json({ success: true, profil: results });
+        res.json({ success: true, cocktails: results });
     });
 };
-exports.getUserProfile = getUserProfile;
+exports.searchCocktail = searchCocktail;

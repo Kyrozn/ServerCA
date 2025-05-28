@@ -12,10 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CocktailRegister = exports.CocktailLogin = void 0;
+exports.getUserProfile = exports.CocktailRegister = exports.CocktailLogin = void 0;
 const db_1 = require("../config/db");
 const uuid_1 = require("uuid");
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const JWT_SECRET = "your_jwt_secret";
 const CocktailLogin = (req, res) => {
@@ -28,7 +27,7 @@ const CocktailLogin = (req, res) => {
             return res
                 .status(404)
                 .json({ success: false, message: "User not found" });
-        const isMatch = yield bcrypt_1.default.compare(password, user.Password);
+        const isMatch = password === user.Password;
         if (!isMatch)
             return res
                 .status(401)
@@ -60,13 +59,12 @@ const CocktailRegister = (req, res) => {
             return res
                 .status(409)
                 .json({ success: false, message: "User already exists" });
-        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
         const userId = (0, uuid_1.v4)();
         const insertQuery = `
       INSERT INTO Users (ID, Email, First_name, Last_name, Password, Role)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-        db_1.connection.query(insertQuery, [userId, email, name, Sname, hashedPassword, "user"], (err) => {
+        db_1.connection.query(insertQuery, [userId, email, name, Sname, password, "user"], (err) => {
             if (err)
                 return res.status(500).json({
                     success: false,
@@ -80,3 +78,18 @@ const CocktailRegister = (req, res) => {
     }));
 };
 exports.CocktailRegister = CocktailRegister;
+const getUserProfile = (req, res) => {
+    const { userId } = req.body;
+    if (!userId) {
+        res.status(400).json({ success: false, message: "User ID is required" });
+        return;
+    }
+    const query = "SELECT ID,	Email, First_name,	Last_name, Role FROM Users WHERE ID = ?";
+    db_1.connection.query(query, [userId], (error, results) => {
+        if (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        res.json({ success: true, profil: results });
+    });
+};
+exports.getUserProfile = getUserProfile;

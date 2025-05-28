@@ -4,9 +4,10 @@ import bodyParser from "body-parser";
 import path from "path";
 import authRoutes from "./routes/auth.routes";
 import cocktailRoutes from "./routes/cocktail.routes";
+import adminRoutes from "./routes/admin.routes"
 const router = express.Router();
-const upload = require("../middlewares/multer"); // le fichier avec multer.config
-const recipeController = require("../controllers/recipe.controller");
+import upload from "./middlewares/multer";
+import { createRecipe } from "./controllers/recipes.controller";
 const app = express();
 const PORT = 5050;
 
@@ -19,8 +20,9 @@ app.use("/cocktailImage", express.static(path.join(__dirname, "Image")));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/cocktails", cocktailRoutes);
+app.use("/api/admin", adminRoutes);
 
-router.post('/api/recipes', upload.single('photo'), recipeController.createRecipe);
+app.post("/api/recipes", upload.single("photo"), createRecipe);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

@@ -14,8 +14,8 @@ CREATE TABLE `Users`
 (
     `ID`        uuid PRIMARY KEY,
     `Email`     varchar(100) UNIQUE NOT NULL,
-    `FirstName` varchar(100)        NOT NULL,
-    `LastName`  varchar(100)        NOT NULL,
+    `First_name` varchar(100)        NOT NULL,
+    `Last_name`  varchar(100)        NOT NULL,
     `Password`  varchar(100)        NOT NULL,
     `Role`      enum('User', 'Admin') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
